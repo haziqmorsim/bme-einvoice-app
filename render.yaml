@@ -3,14 +3,29 @@ services:
     name: bme-einvoice-app
     runtime: docker
     dockerfilePath: ./Dockerfile
-    plan: starter          # "free" also works; starter avoids cold-start spin-down
+    plan: free             # runs on the free 512 MB tier
     healthCheckPath: /api/health
     envVars:
       # Offline rules backend: free, no API key required.
       - key: EXTRACTION_BACKEND
         value: rules
-      # tesseract & poppler are on PATH inside the Docker image, so leave blank.
-      - key: TESSERACT_CMD
-        value: ""
+      # --- Memory tuning for the free 512 MB tier ---
+      # glibc otherwise reserves up to 8 x nCPU malloc arenas (huge virtual
+      # memory). Under a tight memory cap that makes fork() fail with ENOMEM
+      # when spawning poppler, which pdf2image misreports as
+      # "Is poppler installed and in PATH?". Capping arenas fixes that.
+      - key: MALLOC_ARENA_MAX
+        value: "2"
+      # Keep Tesseract single-threaded (less memory, less CPU on tiny instances).
+      - key: OMP_THREAD_LIMIT
+        value: "1"
+      # Lower render DPI to reduce peak memory on small instances (default 220).
+      - key: RENDER_DPI
+        value: "150"
+      # Point pdf2image straight at the poppler binaries installed by the image,
+      # so it never depends on PATH resolution at runtime.
       - key: POPPLER_PATH
+        value: "/usr/bin"
+      # tesseract is on PATH inside the Docker image, so leave blank.
+      - key: TESSERACT_CMD
         value: ""

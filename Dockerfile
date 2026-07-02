@@ -8,6 +8,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
+# --- Memory tuning for small (512 MB) hosts ---
+# Cap glibc malloc arenas so fork()/spawn of poppler doesn't fail with ENOMEM
+# under a tight memory limit; keep Tesseract single-threaded.
+ENV MALLOC_ARENA_MAX=2 \
+    OMP_THREAD_LIMIT=1
+
 WORKDIR /app
 
 # Install Python dependencies first (better build caching)

@@ -42,6 +42,7 @@ _LOCK = threading.Lock()
 
 
 def _output_filename(job: Job) -> str:
+    """Name the downloaded Excel after the uploaded PDF(s)."""
     stems = [Path(n).stem for n in job.file_names if n]
     if not stems:
         return "invoices.xlsx"
@@ -70,9 +71,16 @@ def _process(job_id: str, files: list[tuple[str, bytes]]) -> None:
         job.status = "processing"
 
         # Phase 1: render + OCR every page (so we know the total for the bar).
+        # Only the vision (LLM) backends need the rendered image kept in memory;
+        # the offline "rules" backend reads OCR text only, so we drop images to
+        # keep peak memory low on small hosts.
+        keep_images = (settings.extraction_backend or "").strip().lower() in (
+            "ollama",
+            "anthropic",
+        )
         all_pages: list[tuple[str, list]] = []
         for name, data in files:
-            pages = process_pdf(data)
+            pages = process_pdf(data, keep_images=keep_images)
             all_pages.append((name, pages))
             job.total_pages += len(pages)
 
@@ -95,6 +103,12 @@ def _process(job_id: str, files: list[tuple[str, bytes]]) -> None:
         job.status = "done"
         job.message = f"Extracted {len(job.rows)} invoice(s) from {len(files)} file(s)."
     except Exception as exc:  # noqa: BLE001
+        import traceback
+        # Log the full traceback so the real cause is visible in server logs
+        # (the message shown to the user is often misleading, e.g. pdf2image
+        # reports "Is poppler installed?" for any OS-level spawn failure,
+        # including out-of-memory fork() errors).
+        traceback.print_exc()
         job.status = "error"
         job.message = str(exc)
 
