@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: bme-einvoice-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter          # "free" also works; starter avoids cold-start spin-down
+    healthCheckPath: /api/health
+    envVars:
+      # Offline rules backend: free, no API key required.
+      - key: EXTRACTION_BACKEND
+        value: rules
+      # tesseract & poppler are on PATH inside the Docker image, so leave blank.
+      - key: TESSERACT_CMD
+        value: ""
+      - key: POPPLER_PATH
+        value: ""
