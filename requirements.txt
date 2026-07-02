@@ -1,0 +1,23 @@
+# --- Web framework ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+
+# --- PDF -> image rendering & OCR ---
+pdf2image==1.17.0
+pytesseract==0.3.13
+Pillow==11.1.0
+
+# --- Excel output ---
+openpyxl==3.1.5
+
+# --- Config / models ---
+pydantic==2.10.4
+pydantic-settings==2.7.1
+python-dotenv==1.0.1
+
+# --- Extraction backends ---
+# "ollama" and "rules" backends need NO extra packages (they use the standard
+# library / a local Ollama server). The "anthropic" backend is OPTIONAL and only
+# needed if you set EXTRACTION_BACKEND=anthropic. Uncomment to enable it:
+# anthropic==0.42.0

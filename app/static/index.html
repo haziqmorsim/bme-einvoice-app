@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BME e-Invoice App</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">BME</span>
+      <div>
+        <h1>e-Invoice App</h1>
+        <p>Scan invoice PDFs &rarr; organised Excel</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Step 1: upload -->
+    <section id="uploadCard" class="card">
+      <div id="dropzone" class="dropzone">
+        <input id="fileInput" type="file" accept="application/pdf" multiple hidden />
+        <div class="dz-icon">&#128196;</div>
+        <p class="dz-title">Drop invoice PDFs here</p>
+        <p class="dz-sub">or <button id="browseBtn" class="link">browse files</button></p>
+      </div>
+      <ul id="fileList" class="file-list"></ul>
+      <button id="runBtn" class="btn btn-primary" disabled>Extract</button>
+    </section>
+
+    <!-- Step 2: progress -->
+    <section id="progressCard" class="card hidden">
+      <h2 class="card-title">Processing&hellip;</h2>
+      <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+      <p id="progressText" class="muted">Starting&hellip;</p>
+    </section>
+
+    <!-- Step 3: results -->
+    <section id="resultCard" class="card hidden">
+      <div class="result-head">
+        <h2 class="card-title">Results</h2>
+        <div class="result-actions">
+          <button id="downloadBtn" class="btn btn-primary">Download Excel</button>
+          <button id="resetBtn" class="btn btn-ghost">Start again</button>
+        </div>
+      </div>
+      <p id="resultMsg" class="muted"></p>
+      <div id="warnings" class="warnings hidden"></div>
+      <div class="table-wrap">
+        <table id="resultTable">
+          <thead>
+            <tr>
+              <th>Project No</th><th>Vendor</th><th>Invoice No</th><th>POD</th><th>Type</th>
+              <th class="num">Freight</th><th class="num">Local</th><th class="num">Storage</th>
+              <th class="num">Transport</th><th class="num">Reimburse</th><th class="num">Total</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

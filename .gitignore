@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+generated/
+*.png
+!app/static/*.png
